@@ -28,6 +28,7 @@
 				hadNotifications: false,
 				backgroundFetching: false,
 				shutdown: false,
+				playedSound: false,
 				notifications: []
 			};
 		},
@@ -36,6 +37,7 @@
 		_$button: null,
 		_$icon: null,
 		_$container: null,
+		_$audio: null,
 
 		computed: {
 			iconPath: function() {
@@ -71,6 +73,15 @@
 			},
 			onRemove: function(index) {
 				this.notifications.splice(index, 1);
+			},
+			playSound: function() {
+				if (this.playedSound) {
+					// Already played in this background fetch
+					return;
+				}
+
+				this._$audio.play();
+				this.playedSound = true;
 			}
 		},
 
@@ -83,6 +94,11 @@
 			this._$button = this._$el.find('.notifications-button');
 			this._$icon = this._$button.find('img');
 			this._$container = this._$el.find('.notification-container');
+
+			const $audio = $('<audio>');
+			$('<source>').attr('src', OC.linkTo('notifications', 'resources/talk.mp3')).appendTo($audio);
+			$('<source>').attr('src', OC.linkTo('notifications', 'resources/talk.ogg')).appendTo($audio);
+			this._$audio = $audio[0];
 
 			// Bind the button click event
 			OC.registerMenu(this._$button, this._$container);
